@@ -1,0 +1,16 @@
+{
+  "name": "database-service",
+  "version": "1.0.0",
+  "description": "Serverless database-service example using Typescript",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@types/node": "^14.0.20",
+    "typescript": "^3.9.6",
+    "aws-sdk": "^2.697.0"
+  }
+}

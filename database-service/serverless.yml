@@ -1,0 +1,54 @@
+service: 
+  name: database-service
+# app and org for use with dashboard.serverless.com
+# app: serverless-test
+org: debanshus
+
+provider:
+  name: aws
+  profile: serverless
+  region: us-east-1
+  stackName: database-service-stack
+
+resources: # CloudFormation template syntax
+  Resources:
+    Departments:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: Departments
+        AttributeDefinitions:
+          - AttributeName: deptId
+            AttributeType: S
+        KeySchema:
+          - AttributeName: deptId
+            KeyType: HASH
+        ProvisionedThroughput:
+          ReadCapacityUnits: 1
+          WriteCapacityUnits: 1  
+
+    Employees:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: Employees
+        AttributeDefinitions:
+          - AttributeName: empId
+            AttributeType: S
+        KeySchema:
+          - AttributeName: empId
+            KeyType: HASH 
+        ProvisionedThroughput:
+          ReadCapacityUnits: 1
+          WriteCapacityUnits: 1
+
+  Outputs:  
+    DepartmentTableArn:
+      Value:
+          Fn::GetAtt: [Departments, Arn]
+      Export:
+        Name: DepartmentTableArn
+
+    EmployeeTableArn:
+      Value:
+          Fn::GetAtt: [Employees, Arn]
+      Export:
+        Name: EmployeeTableArn    
