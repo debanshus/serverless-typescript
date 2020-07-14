@@ -21,31 +21,35 @@ export class departmentController {
     }
 
     async update(data: string) {
-        const department = JSON.parse(data) as departmentDto
+        var department: any;
+        try {
+            department = JSON.parse(data) as departmentDto;
+        } catch (error) {
+            console.error("Error in request body while updating deparment: ", error)
+            return error;
+        }
         var updateExpression = "set ";
         var expressionAttributeValues = "{";
         if (department.deptName != null) {
             updateExpression = updateExpression + "deptName = :deptName";
-            expressionAttributeValues = expressionAttributeValues + "':deptName' : '" + department.deptName + "'";
+            expressionAttributeValues = expressionAttributeValues + "\":deptName\" : \"" + department.deptName + "\"";
         }
         if (department.deptLocation != null) {
             updateExpression = updateExpression + ", deptLocation = :deptLocation";
-            expressionAttributeValues = expressionAttributeValues + ", ':deptLocation' : '" + department.deptLocation + "'";
+            expressionAttributeValues = expressionAttributeValues + ", \":deptLocation\" : \"" + department.deptLocation + "\"";
         }
         expressionAttributeValues = expressionAttributeValues + "}";
 
         console.log("updateExpression:", updateExpression);
         console.log("expressionAttributeValues:", expressionAttributeValues);
 
-        var response: any;
         try {
-            response = await this.service.update({ deptId: department.deptId },
-                updateExpression, JSON.parse(expressionAttributeValues));
+            await this.service.update({ deptId: department.deptId }, updateExpression, expressionAttributeValues);
         } catch (error) {
             console.error("Error in updating deparment: ", error)
             return error;
         }
-        return this.successResponse(200, response.Attributes);
+        return this.successResponse(200, "Data updated successfully!");
     }
 
     async remove(data: string) {

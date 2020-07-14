@@ -15,9 +15,9 @@ export class departmentService {
     };
 
     async update(key: any, updateExpression: any, expressionAttributeValues: any) {
-        console.log("Updating table", this.table, ", where key", JSON.stringify(key), ", with data", JSON.stringify(expressionAttributeValues));
+        console.log("Updating table", this.table, ", where key", JSON.stringify(key), ", with data", expressionAttributeValues);
         return await this.dynamoDbClient.update({TableName: this.table, Key: key, UpdateExpression: updateExpression, 
-            ExpressionAttributeValues: expressionAttributeValues}).promise();
+            ExpressionAttributeValues: JSON.parse(expressionAttributeValues)}).promise();
     };
 
     async remove(key: any) {
