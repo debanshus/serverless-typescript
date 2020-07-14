@@ -1,12 +1,12 @@
-import { departmentService } from '../src/departmentService';
+import { departmentController } from '../src/departmentController';
 import { assert } from 'chai';
 
 describe('departmentService', function () {
-    var deptService: departmentService;
+    var controller: departmentController;
 
     before(function () {
         // runs once before the first test in this block
-        deptService = new departmentService();
+        controller = new departmentController();
     });
 
     after(function () {
@@ -23,7 +23,7 @@ describe('departmentService', function () {
 
 
     it('insert should be successfull', () => {
-        var response = deptService.insert('{"deptId":"D01","deptName":"IT","deptLocation":"Unit1"}');
+        var response = controller.create('{"deptId":"D01","deptName":"IT","deptLocation":"Unit1"}');
         assert.isNotNull(response);
     });
 
@@ -33,17 +33,17 @@ describe('departmentService', function () {
     });*/
 
     it('remove should be successfull', () => {
-        var response = deptService.remove('{"deptId":"D01"}');
+        var response = controller.remove('{"deptId":"D01"}');
         assert.isNotNull(response);
     });
 
     it('get should be successfull', () => {
-        var response = deptService.get("D01");
+        var response = controller.fetch("D01");
         assert.isNotNull(response);
     });
 
     it('getAll should be successfull', () => {
-        var response = deptService.getAll();
+        var response = controller.fetchAll();
         assert.isNotNull(response);
     });
 });

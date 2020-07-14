@@ -1,62 +1,37 @@
-import { dynamoDBClient } from '../../database-service/src/dynamoDBClient';
-import { departmentDto } from '../../database-service/src/departmentDto';
+import { DynamoDB } from 'aws-sdk'
 
 export class departmentService {
+    private table: string;
+    private dynamoDbClient: DynamoDB.DocumentClient;
 
-    dynamoDb = new dynamoDBClient("us-east-1");
-    tableName = "Departments";
-
-    private createResponse(statusCode: number, message: any) {
-        var lambdaResponse = {
-            statusCode: statusCode,
-            body: (typeof message == undefined || message == null) ? '' : JSON.stringify(message)
-        };
-        console.log("Lambda Response: ", lambdaResponse);
-        return lambdaResponse;
+    constructor(table: string, region: string) {
+        this.table = table;
+        this.dynamoDbClient = new DynamoDB.DocumentClient({ "region": region });
     }
 
-    async insert(data: string) {
-        const item = JSON.parse(data);
-        await this.dynamoDb.insert(this.tableName, item);
-        this.createResponse(200, "Data inserted successfully!");
-    }
+    async create(item: any) {
+        console.log("Inserting into table", this.table, " values", JSON.stringify(item));
+        return await this.dynamoDbClient.put({ TableName: this.table, Item: item }).promise();
+    };
 
-    async update(data: string) {
-        const department = JSON.parse(data) as departmentDto
-        var updateExpression = "set ";
-        var expressionAttributeValues = "{";
-        if (department.deptName != null) {
-            updateExpression = updateExpression + "deptName = :deptName";
-            expressionAttributeValues = expressionAttributeValues + "':deptName' : '" + department.deptName + "'";
-        }
-        if (department.deptLocation != null) {
-            updateExpression = updateExpression + ", deptLocation = :deptLocation";
-            expressionAttributeValues = expressionAttributeValues + ", ':deptLocation' : '" + department.deptLocation + "'";
-        }
-        expressionAttributeValues = expressionAttributeValues + "}";
+    async update(key: any, updateExpression: any, expressionAttributeValues: any) {
+        console.log("Updating table", this.table, ", where key", JSON.stringify(key), ", with data", JSON.stringify(expressionAttributeValues));
+        return await this.dynamoDbClient.update({TableName: this.table, Key: key, UpdateExpression: updateExpression, 
+            ExpressionAttributeValues: expressionAttributeValues}).promise();
+    };
 
-        console.log("updateExpression:", updateExpression);
-        console.log("expressionAttributeValues:", expressionAttributeValues);
+    async remove(key: any) {
+        console.log("Deleting from table", this.table, ", item", JSON.stringify(key));
+        return await this.dynamoDbClient.delete({ TableName: this.table, Key: key }).promise();
+    };
+      
+    async fetch(key: any) {
+        console.log("Fetching data from table", this.table, ", where key is", JSON.stringify(key));
+        return await this.dynamoDbClient.get({ TableName: this.table, Key: key }).promise();
+    };
 
-        var response = await this.dynamoDb.update(this.tableName, { deptId: department.deptId },
-            updateExpression, JSON.parse(expressionAttributeValues));
-        this.createResponse(200, response.Attributes);
-    }
-
-    async remove(data: string) {
-        const department = JSON.parse(data) as departmentDto
-        var response = await this.dynamoDb.remove(this.tableName, { deptId: department.deptId });
-        this.createResponse(200, response.Attributes);
-    }
-
-
-    async get(deptId: string) {
-        var response = await this.dynamoDb.get(this.tableName, { deptId: deptId });
-        this.createResponse(200, response.Item);
-    }
-
-    async getAll() {
-        var response = await this.dynamoDb.getAll(this.tableName);
-        this.createResponse(200, response.Items);
-    }
+    async fetchAll() {
+        console.log("Fetching all data from table", this.table);
+        return await this.dynamoDbClient.scan({ TableName: this.table }).promise();
+    }; 
 }

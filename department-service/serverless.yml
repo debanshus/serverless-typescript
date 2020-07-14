@@ -4,14 +4,9 @@ service:
 # app: serverless-test
 org: debanshus
 
-custom:
-  webpack:
-    webpackConfig: ./webpack.config.js
-    includeModules: true
-
-# Add the serverless-webpack plugin
 plugins:
-  - serverless-webpack
+  - serverless-offline
+  - serverless-plugin-typescript 
 
 provider:
   name: aws
@@ -35,37 +30,42 @@ provider:
       Resource: ${cf:database-service-stack.DepartmentTableArn}
 
 functions:
-  insert:
-    handler: src/handler.insert
+  create:
+    handler: src/departmentHandler.create
     events:
       - http:
-          path: insert
+          path: create
           method: post
+          cors: true   
 
   update:
-    handler: src/handler.update
+    handler: src/departmentHandler.update
     events:
       - http:
           path: update
           method: put
+          cors: true   
 
   remove:
-    handler: src/handler.remove
+    handler: src/departmentHandler.remove
     events:
       - http:
           path: remove
           method: post
+          cors: true   
 
-  get:
-    handler: src/handler.get
+  fetch:
+    handler: src/departmentHandler.fetch
     events:
       - http:
-          path: get/{deptId}
+          path: fetch/{deptId}
           method: get
+          cors: true   
 
-  getAll:
-    handler: src/handler.getAll
+  fetchAll:
+    handler: src/departmentHandler.fetchAll
     events:
       - http:
-          path: getAll
+          path: fetchAll
           method: get
+          cors: true   
